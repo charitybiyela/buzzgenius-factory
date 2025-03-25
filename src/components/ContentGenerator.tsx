@@ -1,39 +1,34 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Loader2, RefreshCw, Copy } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { aiPrompts, getPlatformById } from "@/utils/platformData";
-import { getTemplateById } from "@/utils/templates";
+import { getPlatformById } from "@/utils/platformData";
+import { getTemplateById, getThemeById } from "@/utils/templates";
 
 interface ContentGeneratorProps {
   selectedTemplate: string;
   selectedPlatform: string;
   selectedTone: string;
+  selectedTheme: string;
   onContentGenerated: (caption: string, hashtags: string[]) => void;
 }
 
 export default function ContentGenerator({ 
-  selectedTemplate, 
   selectedPlatform, 
   selectedTone,
+  selectedTheme,
   onContentGenerated
 }: ContentGeneratorProps) {
   const { toast } = useToast();
-  const [keywords, setKeywords] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedCaption, setGeneratedCaption] = useState("");
-  const [generatedHashtags, setGeneratedHashtags] = useState<string[]>([]);
 
   // In a real app, this would call an AI API
   const generateContent = () => {
-    if (!keywords.trim()) {
+    if (!selectedPlatform || !selectedTone || !selectedTheme) {
       toast({
-        title: "Keywords required",
-        description: "Please enter keywords to generate content",
+        title: "Incomplete selection",
+        description: "Please select all options to generate content",
         variant: "destructive"
       });
       return;
@@ -43,36 +38,43 @@ export default function ContentGenerator({
     
     // Simulate API call
     setTimeout(() => {
-      const template = getTemplateById(selectedTemplate);
       const platform = getPlatformById(selectedPlatform);
+      const theme = getThemeById(selectedTheme);
       
-      if (!template || !platform) {
+      if (!platform || !theme) {
         toast({
           title: "Error",
-          description: "Please select a template and platform",
+          description: "Please select a platform and theme",
           variant: "destructive"
         });
         setIsGenerating(false);
         return;
       }
 
-      // Mock AI-generated caption based on template example
-      const keywordsList = keywords.split(',').map(k => k.trim());
-      let caption = template.example;
+      // Sample lifestyle captions
+      const lifestyleCaptions = [
+        "✨ Living the dream, one day at a time!\n\n✨ Whether it's a cozy coffee date ☕ with friends, diving into a new book 📚, or soaking up the sun ☀️ during a lazy afternoon, it's all about those little moments that make life beautiful. 🧡\n\nWhat's your favorite way to unwind and enjoy life? Let's share some good vibes! 👇💕",
+        "Finding joy in the simple things today ✨\n\nSometimes it's the quiet moments that speak the loudest. A perfect morning with sunshine, good coffee, and time to breathe. What small joy are you grateful for today? ☀️☕",
+        "Monday motivation: Create a life you don't need a vacation from ✨\n\nStarting the week with intention and positivity. What's one small step you're taking today toward your goals? Share below! 💫"
+      ];
       
-      // Insert some keywords
-      keywordsList.forEach(keyword => {
-        caption = caption.replace('[benefit]', keyword).replace('[key feature]', keyword);
-      });
+      // Generate hashtags based on theme
+      let hashtags = [];
+      if (selectedTheme === "lifestyle") {
+        hashtags = ["#Lifestyle", "#GoodVibesOnly", "#ChillOut", "#EverydayMoments", "#LivingMyBestLife"];
+      } else if (selectedTheme === "business") {
+        hashtags = ["#BusinessGrowth", "#Entrepreneurship", "#Success", "#Leadership", "#BusinessTips"];
+      } else if (selectedTheme === "food") {
+        hashtags = ["#FoodLover", "#Foodie", "#Delicious", "#Yummy", "#FoodPhotography"];
+      } else {
+        hashtags = ["#Trending", "#FollowMe", "#SocialMedia", "#ContentCreation", "#Engagement"];
+      }
       
-      // Generate some mock hashtags
-      const mockHashtags = keywordsList.map(k => `#${k.replace(/\s+/g, '')}`);
-      // Add some generic hashtags
-      mockHashtags.push('#trending', '#innovation', '#growth', '#social');
+      // Random selection for demo purposes
+      const randomIndex = Math.floor(Math.random() * lifestyleCaptions.length);
+      const caption = lifestyleCaptions[randomIndex];
       
-      setGeneratedCaption(caption);
-      setGeneratedHashtags(mockHashtags.slice(0, platform.hashtagLimit));
-      onContentGenerated(caption, mockHashtags.slice(0, platform.hashtagLimit));
+      onContentGenerated(caption, hashtags);
       setIsGenerating(false);
       
       toast({
@@ -82,100 +84,16 @@ export default function ContentGenerator({
     }, 1500);
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      description: "Copied to clipboard",
-    });
-  };
-
   return (
-    <div className="w-full animate-fade-in">
-      <h2 className="text-xl font-medium mb-4">Generate Content</h2>
-      
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="keywords">Keywords (separated by commas)</Label>
-          <Input
-            id="keywords"
-            value={keywords}
-            onChange={(e) => setKeywords(e.target.value)}
-            placeholder="e.g., productivity, time management, efficiency"
-            className="w-full"
-          />
-        </div>
-        
-        <Button 
-          onClick={generateContent} 
-          disabled={isGenerating || !selectedTemplate || !selectedPlatform || !selectedTone}
-          className="w-full"
-        >
-          {isGenerating ? (
-            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...</>
-          ) : (
-            <>Generate Content</>
-          )}
-        </Button>
-        
-        {generatedCaption && (
-          <div className="space-y-4 animate-fade-in">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="caption">Caption</Label>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => copyToClipboard(generatedCaption)}
-                  className="h-8 px-2"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <Textarea
-                id="caption"
-                value={generatedCaption}
-                onChange={(e) => setGeneratedCaption(e.target.value)}
-                className="min-h-[120px]"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="hashtags">Hashtags</Label>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => copyToClipboard(generatedHashtags.join(' '))}
-                  className="h-8 px-2"
-                >
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="p-3 bg-muted/30 rounded-md max-h-[100px] overflow-y-auto">
-                <div className="flex flex-wrap gap-2">
-                  {generatedHashtags.map((hashtag, index) => (
-                    <span 
-                      key={index} 
-                      className="inline-flex bg-secondary px-2 py-1 rounded-md text-xs font-medium"
-                    >
-                      {hashtag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <Button 
-              variant="outline" 
-              onClick={generateContent} 
-              disabled={isGenerating}
-              className="w-full"
-            >
-              <RefreshCw className="mr-2 h-4 w-4" /> Regenerate
-            </Button>
-          </div>
-        )}
-      </div>
+    <div className="w-full mt-8">
+      <Button 
+        onClick={generateContent} 
+        disabled={isGenerating || !selectedPlatform || !selectedTone || !selectedTheme}
+        className="w-full h-12 text-base font-medium"
+      >
+        <Sparkles className="mr-2 h-5 w-5" /> 
+        {isGenerating ? "Generating..." : "Generate Post"}
+      </Button>
     </div>
   );
 }

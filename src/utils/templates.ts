@@ -13,6 +13,40 @@ export type TemplateCategory = {
   templates: Template[];
 };
 
+export type Theme = {
+  id: string;
+  name: string;
+  description: string;
+};
+
+export const themes: Theme[] = [
+  {
+    id: "lifestyle",
+    name: "Lifestyle",
+    description: "Content about daily life, wellness, and personal experiences"
+  },
+  {
+    id: "business",
+    name: "Business",
+    description: "Professional content focused on career, entrepreneurship, and industry trends"
+  },
+  {
+    id: "food",
+    name: "Food",
+    description: "Content about recipes, restaurants, cooking tips, and food experiences"
+  },
+  {
+    id: "travel",
+    name: "Travel",
+    description: "Content about destinations, travel tips, and adventure experiences"
+  },
+  {
+    id: "fitness",
+    name: "Fitness",
+    description: "Content about workouts, health tips, and fitness journeys"
+  }
+];
+
 export const templateCategories: TemplateCategory[] = [
   {
     id: "promotional",
@@ -107,4 +141,8 @@ export const getTemplateById = (templateId: string): Template | undefined => {
 
 export const getCategoryById = (categoryId: string): TemplateCategory | undefined => {
   return templateCategories.find(c => c.id === categoryId);
+};
+
+export const getThemeById = (themeId: string): Theme | undefined => {
+  return themes.find(t => t.id === themeId);
 };

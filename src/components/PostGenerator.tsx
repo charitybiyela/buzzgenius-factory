@@ -1,16 +1,16 @@
 
 import React, { useState } from "react";
-import TemplateSelector from "./TemplateSelector";
 import PlatformSelector from "./PlatformSelector";
 import ToneSelector from "./ToneSelector";
+import ThemeSelector from "./ThemeSelector";
 import ContentGenerator from "./ContentGenerator";
 import PostPreview from "./PostPreview";
-import { Separator } from "@/components/ui/separator";
+import { Edit } from "lucide-react";
 
 export default function PostGenerator() {
-  const [selectedTemplate, setSelectedTemplate] = useState("");
-  const [selectedPlatform, setSelectedPlatform] = useState("");
-  const [selectedTone, setSelectedTone] = useState("professional");
+  const [selectedPlatform, setSelectedPlatform] = useState("instagram");
+  const [selectedTone, setSelectedTone] = useState("casual");
+  const [selectedTheme, setSelectedTheme] = useState("lifestyle");
   const [generatedCaption, setGeneratedCaption] = useState("");
   const [generatedHashtags, setGeneratedHashtags] = useState<string[]>([]);
   
@@ -20,56 +20,51 @@ export default function PostGenerator() {
   };
   
   return (
-    <div className="w-full space-y-8">
-      <section>
-        <TemplateSelector 
-          selectedTemplate={selectedTemplate}
-          onSelectTemplate={setSelectedTemplate}
-        />
-      </section>
-      
-      <Separator />
-      
-      <section>
+    <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="space-y-6">
+        <div className="flex items-center mb-4">
+          <Edit className="h-5 w-5 mr-2" />
+          <h2 className="text-lg font-medium">Customize Your Post</h2>
+        </div>
+        
         <PlatformSelector 
           selectedPlatform={selectedPlatform}
           onSelectPlatform={setSelectedPlatform}
         />
-      </section>
-      
-      <Separator />
-      
-      <section>
+        
         <ToneSelector 
           selectedTone={selectedTone}
           onSelectTone={setSelectedTone}
         />
-      </section>
-      
-      <Separator />
-      
-      <section>
+        
+        <ThemeSelector
+          selectedTheme={selectedTheme}
+          onSelectTheme={setSelectedTheme}
+        />
+        
         <ContentGenerator 
-          selectedTemplate={selectedTemplate}
+          selectedTemplate=""
           selectedPlatform={selectedPlatform}
           selectedTone={selectedTone}
+          selectedTheme={selectedTheme}
           onContentGenerated={handleContentGenerated}
         />
-      </section>
+      </div>
       
-      {generatedCaption && (
-        <>
-          <Separator />
-          
-          <section>
-            <PostPreview 
-              selectedPlatform={selectedPlatform}
-              caption={generatedCaption}
-              hashtags={generatedHashtags}
-            />
-          </section>
-        </>
-      )}
+      <div>
+        {generatedCaption ? (
+          <PostPreview 
+            caption={generatedCaption}
+            hashtags={generatedHashtags}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center p-8 bg-gray-50 rounded-lg border border-dashed text-gray-400">
+            <p className="text-center">
+              Generate a post to see the preview here
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
