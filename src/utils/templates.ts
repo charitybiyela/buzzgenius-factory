@@ -37,7 +37,7 @@ export const templateCategories: TemplateCategory[] = [
         name: "Testimonial",
         description: "Share customer feedback",
         structure: "Quote + Customer info + Product context + Call to action",
-        example: ""This changed everything for me. I can't imagine going back." - Sarah, who's been using our solution for 3 months. Join the thousands of satisfied customers today."
+        example: "\"This changed everything for me. I can't imagine going back.\" - Sarah, who's been using our solution for 3 months. Join the thousands of satisfied customers today."
       }
     ]
   },
@@ -50,7 +50,7 @@ export const templateCategories: TemplateCategory[] = [
         name: "Quote",
         description: "Share an inspiring quote",
         structure: "Quote + Source + Reflection + Question",
-        example: ""The only way to do great work is to love what you do." - Steve Jobs. This principle guides everything we create. What drives your passion?"
+        example: "\"The only way to do great work is to love what you do.\" - Steve Jobs. This principle guides everything we create. What drives your passion?"
       },
       {
         id: "success-story",
